@@ -1,0 +1,33 @@
+# Configure your debug level
+loglevel: "debug"
+
+# Monitoring interval in seconds
+checkinterval: 5
+
+# Define channels for notification 
+notify:
+  email:
+    smtp:
+      host: "mailtrap.io"
+      port: 465
+      username: user
+      password: pass
+    sender: alert@gmail.com
+    receiver:
+      - admin@gmail.com
+      - operator@gmail.com
+      - support@gmail.com
+  telegram:
+    accesstoken: ""
+    channelid: ""
+
+# Configure entities to monitor
+watch:
+  - id: 1
+    name: "MyWebsite"
+    http:
+      url: "http://mywebsite/url-to-monitor"
+  - id: 2
+    name: "WebServer"
+    process:
+      path: "/bin/nginx"
