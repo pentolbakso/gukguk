@@ -9,5 +9,6 @@ GukGuk is Indonesia's term similar to "woof woof". It's just another watchdog ap
 #### Planned Features
 - [x] Monitor http url
 - [ ] Monitor process
+- [x] Monitor database
 - [ ] Alert to email
 - [x] Alert to Telegram

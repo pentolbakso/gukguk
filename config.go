@@ -16,6 +16,10 @@ type Entity struct {
 	Process struct {
 		Path string
 	}
+	Database struct {
+		Type string
+		Dsn  string
+	}
 }
 
 type AppConfig struct {

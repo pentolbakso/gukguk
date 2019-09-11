@@ -31,3 +31,8 @@ watch:
     name: "WebServer"
     process:
       path: "/bin/nginx"
+  - id: 3
+    name: "MySQL"
+    database:
+      type: "mysql"
+      dsn: "user:password@tcp(127.0.0.1:3306)/databasename"

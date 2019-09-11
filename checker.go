@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
@@ -31,12 +32,15 @@ func (m *Checker) SetNotifChannel(c chan string) *Checker { m.notifChannel = c; 
 
 func (m *Checker) Start() {
 	var success bool
+	var err error
 	//m.logger.Debug().Msgf("Start checking %d - %s", m.Entity.ID, m.Entity.Name)
 
 	if m.Entity.Http.Url != "" {
-		success, _ = m.checkHttp(m.Entity.Http.Url)
+		success, err = m.checkHttp(m.Entity.Http.Url)
 	} else if m.Entity.Process.Path != "" {
-		success, _ = m.checkProcess(m.Entity.Process.Path)
+		success, err = m.checkProcess(m.Entity.Process.Path)
+	} else if m.Entity.Database.Dsn != "" {
+		success, err = m.checkDatabase()
 	}
 
 	if success {
@@ -58,7 +62,7 @@ func (m *Checker) Start() {
 			m.IsRunning = false
 			m.FailCounter++
 
-			m.notifChannel <- fmt.Sprintf("Entity '%s' is DOWN! Previous uptime: %s", m.Entity.Name, elapsed)
+			m.notifChannel <- fmt.Sprintf("Entity '%s' is DOWN! Previous uptime: %s. Error: %s", m.Entity.Name, elapsed, err.Error())
 		}
 	}
 }
@@ -79,5 +83,23 @@ func (m *Checker) checkHttp(url string) (bool, error) {
 }
 
 func (m *Checker) checkProcess(path string) (bool, error) {
+	return true, nil
+}
+
+func (m *Checker) checkDatabase() (bool, error) {
+	dbPool, err := sql.Open(m.Entity.Database.Type, m.Entity.Database.Dsn)
+	if err != nil {
+		m.logger.Error().Err(err).Msg("Connect DB failed!")
+		return false, err
+	}
+
+	err = dbPool.Ping()
+	if err != nil {
+		m.logger.Error().Err(err).Msg("Ping DB failed!")
+		return false, err
+	}
+
+	m.logger.Debug().Msgf("DB connected - %s", m.Entity.Name)
+	dbPool.Close()
 	return true, nil
 }
